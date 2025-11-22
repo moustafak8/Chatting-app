@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="../Css/login.css" />
+    <script src="../script/axios.min.js" defer></script>
+    <script src="../script/login.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign-up</title>
+  </head>
+  <body>
+    <form class="form" id="adding">
+      <p class="form-title">Sign up for an account</p>
+       <div class="input-container">
+        <input type="text" placeholder="Enter Username" id="username" required autocomplete="off"/>
+        <span> </span>
+      </div>
+      <div class="input-container">
+        <input type="email" placeholder="Enter email" id="em" required autocomplete="off"/>
+        <span> </span>
+      </div>
+      <div class="input-container">
+        <input
+          type="password"
+          placeholder="Enter password"
+          id="pass"
+          required
+          autocomplete="off"
+        />
+      </div>
+      <div class="input-container">
+        <input
+          type="password"
+          placeholder="Confirm your password"
+          id="cpass"
+          required
+          autocomplete="off"
+        />
+      </div>
+      <button type="submit" class="submit">Sign up</button>
+
+      <p class="signup-link">
+        Already have an account?
+        <a href="login.html">Log in</a>
+      </p>
+    </form>
+  </body>
+</html>
