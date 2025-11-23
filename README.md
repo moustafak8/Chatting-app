@@ -20,7 +20,7 @@ Automatically generates a short summary when a user has missed 3+ messages.
 
 Clean UI Template for chat layout (HTML/CSS/JS)
 
-🛠️ Tech Stack
+ Tech Stack
 
 Backend: PHP (Core), MySQL
 
