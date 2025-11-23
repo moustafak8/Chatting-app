@@ -3,7 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>1:1 Chat</title>
+    <title>Chat</title>
+    <script src="script/auth.js" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            requireLogin();
+        });
+    </script>
+    <script src="script/axios.min.js" defer></script>
+    <script src="script/chat.js" defer></script>
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
@@ -14,6 +22,7 @@
           <div class="sub">Conversation ID: <span>1</span></div>
         </div>
         <button id="refreshBtn">Refresh</button>
+        <button id="refreshBtn" onclick="logout()">Logout</button>
       </div>
       <div id="messages" class="chat-messages"></div>
       <div class="chat-input">

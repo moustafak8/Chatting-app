@@ -4,11 +4,11 @@ function isLoggedIn() {
 }
 function logout() {
   localStorage.removeItem('userEmail');
-  window.location.href = '../user-login/login.html';
+  window.location.href = 'user-login/login.html';
 }
 function requireLogin() {
   if (!isLoggedIn()) {
-    window.location.href = '../user-login/login.html';
+    window.location.href = 'user-login/login.html';
   }
 }
 

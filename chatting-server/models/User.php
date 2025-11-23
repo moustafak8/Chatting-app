@@ -2,6 +2,7 @@
 include("Model.php");
 
 class User extends Model {
+    private ?int $id;
     private string $username;
     private string $email;
     private string $password;
@@ -9,9 +10,14 @@ class User extends Model {
     protected static string $table = "users";
 
     public function __construct(array $data){
+        $this->id = $data["id"] ?? null;
         $this->username = $data["username"];
         $this->email = $data["email"];
         $this->password = $data["password"];
+    }
+
+    public function getId(): ?int {
+        return $this->id;
     }
 
     public function getemail(){
@@ -22,11 +28,17 @@ class User extends Model {
         $this->username = $username;
     }
     public function __toString(){
-        return  $this->username . " | " . $this->email. " | " . $this->password;
+        $idStr = $this->id !== null ? $this->id : "null";
+        return  $idStr . " | " . $this->username . " | " . $this->email. " | " . $this->password;
     }
     
     public function toArray(){
-        return ["username" => $this->username, "email" => $this->email,"pass" => $this->password];
+        return [
+            "id" => $this->id,
+            "username" => $this->username,
+            "email" => $this->email,
+            "pass" => $this->password
+        ];
     }
 
 }
