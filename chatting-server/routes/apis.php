@@ -7,6 +7,7 @@ $apis = [
     '/users/login' => ['controller' => 'AuthController', 'method' => 'login'],
     '/conversation/create' => ['controller' => 'conversationcontroller', 'method' => 'newconversation'],
     '/participant/create' => ['controller' => 'participantscontroller', 'method' => 'newparticipants'],
+    '/participant' => ['controller' => 'participantscontroller', 'method' => 'get_participant'],
     '/message/create' => ['controller' => 'messagecontroller', 'method' => 'new_message'],
     '/message' => ['controller' => 'messagecontroller', 'method' => 'get_message'],
     '/status' => ['controller' => 'status_controller', 'method' => 'get_status'],

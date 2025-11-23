@@ -5,6 +5,24 @@ require_once(__DIR__ . "/../connection/connection.php");
 
 class participantscontroller
 {
+     function get_participant()
+    {
+        global $connection;
+        if (isset($_GET["id"])) {
+            $id = $_GET["id"];
+            $message = participants::find($connection, $id);
+            echo ResponseService::response(200, $message->toArray());
+            return;
+        } else {
+            $messages = participants::findAll($connection);
+            $arr = [];
+            foreach ($messages as $message) {
+                $arr[] = $message->toArray();
+            }
+            echo ResponseService::response(200, $arr);
+            return;
+        }
+    }
     function newparticipants()
     {
         global $connection;
