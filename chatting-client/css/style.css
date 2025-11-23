@@ -290,3 +290,16 @@ body {
 .chat-input button:active {
   transform: translateY(0);
 }
+
+#unread-summary-container {
+  padding: 10px;
+  margin: 10px;
+  border: 1px solid #764ba2;
+  border-radius: 8px;
+  background-color: #f0e9ff;
+  font-style: italic;
+  font-size: 14px;
+  color: #4b2990;
+  max-height: 150px;
+  overflow-y: auto;
+}

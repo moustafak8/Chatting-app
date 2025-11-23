@@ -1,5 +1,6 @@
 <?php
 require_once("services/ResponsiveService.php");
+require_once("services/AI_summary.php");
 require_once("services/Authentication.php");
 require_once("routes/apis.php");
 $base_dir = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
