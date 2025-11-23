@@ -88,10 +88,13 @@ function displayMessages(messages) {
         <p>${escapeHtml(msg.content)}</p>
         <div class="message-meta">
           <span class="message-time">${formatTime(msg.created_at)}</span>
-          ${isSent
-        ? `<span class="message-status ${statusClass}" title="${escapeHtml(tooltip)}">${statusIcon}</span>`
-        : ""
-      }
+          ${
+            isSent
+              ? `<span class="message-status ${statusClass}" title="${escapeHtml(
+                  tooltip
+                )}">${statusIcon}</span>`
+              : ""
+          }
         </div>
       </div>
     `;
@@ -152,8 +155,8 @@ function sendMessage() {
       <p>${escapeHtml(message)}</p>
       <div class="message-meta">
         <span class="message-time">${formatTime(
-    optimisticMessage.created_at
-  )}</span>
+          optimisticMessage.created_at
+        )}</span>
         <span class="message-status">✓</span>
       </div>
     </div>
@@ -234,7 +237,61 @@ function markMessagesAsRead() {
   }, 1000); // 1 second delay
 }
 
+function createSummary() {
+  let summaryContainer = document.getElementById("unread-summary-container");
+  if (!summaryContainer) {
+    summaryContainer = document.createElement("div");
+    summaryContainer.id = "unread-summary-container";
+    const chatContainer = document.querySelector(".chat-container");
+    if (chatContainer) {
+      chatContainer.insertBefore(
+        summaryContainer,
+        document.getElementById("messages")
+      );
+    }
+  }
+  return summaryContainer;
+}
+
+function fetchUnreadSummary() {
+  const data = {
+    conversation_id: conversationId,
+    user_id: userId,
+  };
+  axios
+    .post(BASE_URL + "message/unread-summary", data)
+    .then((response) => {
+      if (
+        response.data.status === 200 &&
+        response.data.data &&
+        response.data.data.summary
+      ) {
+        const summaryText = response.data.data.summary;
+        if (
+          summaryText !== "No unread messages" &&
+          summaryText !== "Less than 3 unread messages, no summary generated"
+        ) {
+          const summaryContainer = createSummary();
+          summaryContainer.textContent =
+            "Unread Messages Summary: " + summaryText;
+        } else {
+          const summaryContainer = document.getElementById(
+            "unread-summary-container"
+          );
+          if (summaryContainer) summaryContainer.textContent = "";
+        }
+      } else {
+        console.error("Failed to fetch unread messages summary");
+      }
+    })
+    .catch((error) => {
+      console.error("Error fetching unread summary:", error);
+    });
+}
+
 document.addEventListener("DOMContentLoaded", function () {
-  fetchMessages();
+  fetchMessages().then(() => {
+    fetchUnreadSummary();
+  });
   markMessagesAsRead();
 });

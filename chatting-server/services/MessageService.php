@@ -106,4 +106,34 @@ class MessageService
 
         return true;
     }
+    public static function getunread($conversationId, $userId)
+    {
+        global $connection;
+
+        $sql = "SELECT COUNT(*) as unread_count FROM message_status ms JOIN messages m ON ms.message_id = m.id WHERE ms.user_id = ? AND ms.read_at IS NULL AND m.conversation_id = ?";
+        $query = $connection->prepare($sql);
+        $query->bind_param("ii", $userId, $conversationId);
+        $query->execute();
+        $result = $query->get_result();
+        $data = $result->fetch_assoc();
+        return intval($data['unread_count']);
+    }
+
+    public static function getUnreadMessagesContent($conversationId, $userId)
+    {
+        global $connection;
+
+        $sql = "SELECT m.content FROM message_status ms JOIN messages m ON ms.message_id = m.id WHERE ms.user_id = ? AND ms.read_at IS NULL AND m.conversation_id = ? ORDER BY m.created_at ASC";
+        $query = $connection->prepare($sql);
+        $query->bind_param("ii", $userId, $conversationId);
+        $query->execute();
+        $result = $query->get_result();
+
+        $contents = [];
+        while ($row = $result->fetch_assoc()) {
+            $contents[] = $row['content'];
+        }
+
+        return $contents;
+    }
 }
