@@ -5,4 +5,5 @@ $apis = [
     '/users/update' => ['controller' => 'usercontroller', 'method' => 'updateuser'],
     '/users/delete' => ['controller' => 'usercontroller', 'method' => 'deleteuser'],
     '/users/login' => ['controller' => 'AuthController', 'method' => 'login'],
+    '/conversation/create' => ['controller' => 'conversationcontroller', 'method' => 'newconversation']
 ];
