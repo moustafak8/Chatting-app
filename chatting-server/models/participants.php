@@ -12,6 +12,7 @@ class participants extends Model
 
     public function __construct(array $data)
     {
+         $this->id = $data["id"] ?? null;
         $this->conversation_id= $data["conversation_id"];
         $this->user_id= $data["user_id"];
     }

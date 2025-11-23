@@ -17,12 +17,14 @@
   <body>
     <div class="chat-container">
       <div class="chat-header">
-        <div>
-          <strong>Chat with </strong>
-          <div class="sub">Conversation ID: <span></span></div>
+        <div class="header-info">
+          <strong>Chat with</strong>
+          <div class="sub">Conversation ID: <span>1</span></div>
         </div>
-        <button id="refreshBtn">Refresh</button>
-        <button id="refreshBtn" onclick="logout()">Logout</button>
+        <div class="header-actions">
+          <button id="refreshBtn" class="btn-refresh">Refresh</button>
+          <button id="logoutBtn" class="btn-logout" onclick="logout()">Logout</button>
+        </div>
       </div>
       <div id="messages" class="chat-messages"></div>
       <div class="chat-input">
