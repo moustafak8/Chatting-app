@@ -12,5 +12,6 @@ $apis = [
     '/message' => ['controller' => 'messagecontroller', 'method' => 'get_message'],
     '/message/mark-read' => ['controller' => 'messagecontroller', 'method' => 'mark_as_read'],
     '/status' => ['controller' => 'status_controller', 'method' => 'get_status'],
-    '/status/create' => ['controller' => 'status_controller', 'method' => 'new_status']
+    '/status/create' => ['controller' => 'status_controller', 'method' => 'new_status'],
+    '/summary'=>['controller' => 'AI_controller', 'method' => 'catchup']
 ];
