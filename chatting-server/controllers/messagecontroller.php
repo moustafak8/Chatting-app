@@ -60,4 +60,27 @@ class messagecontroller
             echo ResponseService::response(500, ["error" => "Failed to add Message"]);
         }
     }
+
+    function mark_as_read()
+    {
+        if ($_SERVER["REQUEST_METHOD"] != 'POST') {
+            echo ResponseService::response(405, "Method Not Allowed");
+            exit;
+        }
+        $data = json_decode(file_get_contents("php://input"), true);
+        $conversationId = $data['conversation_id'] ?? null;
+        $userId = $data['user_id'] ?? null;
+
+        if (!$conversationId || !$userId) {
+            echo ResponseService::response(400, "conversation_id and user_id are required");
+            return;
+        }
+
+        $result = MessageService::markMessagesAsRead($conversationId, $userId);
+        if ($result) {
+            echo ResponseService::response(200, ["message" => "Messages marked as read successfully"]);
+        } else {
+            echo ResponseService::response(500, ["error" => "Failed to mark messages as read"]);
+        }
+    }
 }

@@ -10,6 +10,7 @@ $apis = [
     '/participant' => ['controller' => 'participantscontroller', 'method' => 'get_participant'],
     '/message/create' => ['controller' => 'messagecontroller', 'method' => 'new_message'],
     '/message' => ['controller' => 'messagecontroller', 'method' => 'get_message'],
+    '/message/mark-read' => ['controller' => 'messagecontroller', 'method' => 'mark_as_read'],
     '/status' => ['controller' => 'status_controller', 'method' => 'get_status'],
     '/status/create' => ['controller' => 'status_controller', 'method' => 'new_status']
 ];

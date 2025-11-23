@@ -21,12 +21,36 @@ function formatTime(dateString) {
 }
 function getStatusIcon(deliveredAt, readAt) {
   if (readAt) {
-    return "✓✓";
+    return "✓✓"; // Double tick (read) - will be colored blue
   } else if (deliveredAt) {
-    return "✓✓";
+    return "✓✓"; // Double tick (delivered, not read yet) - gray
   } else {
-    return "✓";
+    return "✓"; // Single tick (sent) - gray
   }
+}
+
+function formatDateTime(dateString) {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  return date.toLocaleString([], {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function getStatusTooltip(deliveredAt, readAt) {
+  let tooltip = "";
+  if (deliveredAt) {
+    tooltip = `Delivered at ${formatDateTime(deliveredAt)}`;
+  }
+  if (readAt) {
+    if (tooltip) tooltip += "\n";
+    tooltip += `Read at ${formatDateTime(readAt)}`;
+  }
+  return tooltip || "Sent";
 }
 
 function displayMessages(messages) {
@@ -44,8 +68,19 @@ function displayMessages(messages) {
     messageDiv.className = `message ${isSent ? "sent" : "received"}`;
 
     let statusIcon = "";
+    let statusClass = "";
+    let tooltip = "";
     if (isSent) {
       statusIcon = getStatusIcon(msg.delivered_at, msg.read_at);
+      tooltip = getStatusTooltip(msg.delivered_at, msg.read_at);
+      // Add class for read status (colored double tick)
+      if (msg.read_at) {
+        statusClass = "read";
+      } else if (msg.delivered_at) {
+        statusClass = "delivered";
+      } else {
+        statusClass = "sent";
+      }
     }
 
     messageDiv.innerHTML = `
@@ -53,7 +88,10 @@ function displayMessages(messages) {
         <p>${escapeHtml(msg.content)}</p>
         <div class="message-meta">
           <span class="message-time">${formatTime(msg.created_at)}</span>
-          ${isSent ? `<span class="message-status">${statusIcon}</span>` : ""}
+          ${isSent
+        ? `<span class="message-status ${statusClass}" title="${escapeHtml(tooltip)}">${statusIcon}</span>`
+        : ""
+      }
         </div>
       </div>
     `;
@@ -114,8 +152,8 @@ function sendMessage() {
       <p>${escapeHtml(message)}</p>
       <div class="message-meta">
         <span class="message-time">${formatTime(
-          optimisticMessage.created_at
-        )}</span>
+    optimisticMessage.created_at
+  )}</span>
         <span class="message-status">✓</span>
       </div>
     </div>
@@ -172,9 +210,37 @@ msgInput.addEventListener("keypress", function (e) {
 if (refreshBtn) {
   refreshBtn.addEventListener("click", function () {
     fetchMessages();
+    markMessagesAsRead();
   });
+}
+
+function markMessagesAsRead() {
+  setTimeout(() => {
+    if (document.hasFocus()) {
+      axios
+        .post(BASE_URL + "message/mark-read", {
+          conversation_id: conversationId,
+          user_id: userId,
+        })
+        .then((response) => {
+          if (response.data.status === 200) {
+            console.log("Messages marked as read");
+            fetchMessages();
+          }
+        })
+        .catch((error) => {
+          console.error("Error marking messages as read:", error);
+        });
+    }
+  }, 1000); // 1 second delay
 }
 
 document.addEventListener("DOMContentLoaded", function () {
   fetchMessages();
+  markMessagesAsRead();
+});
+
+// Mark as read when window gains focus
+window.addEventListener("focus", function () {
+  markMessagesAsRead();
 });
