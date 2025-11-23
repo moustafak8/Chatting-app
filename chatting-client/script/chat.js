@@ -1,24 +1,69 @@
 const BASE_URL = "http://localhost/Chatting-app/chatting-server/";
-const userId = localStorage.getItem("id");
+const userId = parseInt(localStorage.getItem("id")); // User 1 or User 2
 const conversationId = 1;
 const msgInput = document.getElementById("msgInput");
 const sendBtn = document.getElementById("sendBtn");
 const messagesContainer = document.getElementById("messages");
 const refreshBtn = document.getElementById("refreshBtn");
-let otherParticipantId = null;
-function loadParticipants() {
-  return axios.get(BASE_URL + "participant").then((response) => {
-    if (response.data.status === 200) {
-      const participants = response.data.data;
-      const otherParticipant = participants.find(
-        (p) => p.user_id != userId && p.conversation_id == conversationId
-      );
-      if (otherParticipant) {
-        otherParticipantId = otherParticipant.user_id;
-      }
-    }
-  });
+
+const otherUserId = userId === 1 ? 2 : 1;
+
+function escapeHtml(text) {
+  const div = document.createElement("div");
+  div.textContent = text;
+  return div.innerHTML;
 }
+
+function formatTime(dateString) {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+function getStatusIcon(deliveredAt, readAt) {
+  if (readAt) {
+    return "✓✓";
+  } else if (deliveredAt) {
+    return "✓✓";
+  } else {
+    return "✓";
+  }
+}
+
+function displayMessages(messages) {
+  messagesContainer.innerHTML = "";
+
+  if (messages.length === 0) {
+    messagesContainer.innerHTML =
+      "<p>No messages yet. Start the conversation!</p>";
+    return;
+  }
+
+  messages.forEach((msg) => {
+    const messageDiv = document.createElement("div");
+    const isSent = msg.sender_user_id == userId;
+    messageDiv.className = `message ${isSent ? "sent" : "received"}`;
+
+    let statusIcon = "";
+    if (isSent) {
+      statusIcon = getStatusIcon(msg.delivered_at, msg.read_at);
+    }
+
+    messageDiv.innerHTML = `
+      <div class="message-content">
+        <p>${escapeHtml(msg.content)}</p>
+        <div class="message-meta">
+          <span class="message-time">${formatTime(msg.created_at)}</span>
+          ${isSent ? `<span class="message-status">${statusIcon}</span>` : ""}
+        </div>
+      </div>
+    `;
+
+    messagesContainer.appendChild(messageDiv);
+  });
+
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
 function fetchMessages() {
   return axios
     .get(BASE_URL + "message", {
@@ -42,131 +87,94 @@ function fetchMessages() {
     });
 }
 
-function displayMessages(messages) {
-  messagesContainer.innerHTML = "";
-
-  if (messages.length === 0) {
-    messagesContainer.innerHTML =
-      "<p>No messages yet. Start the conversation!</p>";
-    return;
-  }
-
-  messages.forEach((msg) => {
-    const messageDiv = document.createElement("div");
-    messageDiv.className = `message ${
-      msg.sender_user_id == userId ? "sent" : "received"
-    }`;
-
-    const isSent = msg.sender_user_id == userId;
-    let statusIcon = "";
-
-    if (isSent) {
-      if (msg.read_at) {
-        statusIcon = "✓✓";
-      } else if (msg.delivered_at) {
-        statusIcon = "✓✓";
-      } else {
-        statusIcon = "✓";
-      }
-    }
-
-    messageDiv.innerHTML = `
-      <div class="message-content">
-        <p>${escapeHtml(msg.content)}</p>
-        <div class="message-meta">
-          <span class="message-time">${formatTime(msg.created_at)}</span>
-          ${isSent ? `<span class="message-status">${statusIcon}</span>` : ""}
-        </div>
-      </div>
-    `;
-
-    messagesContainer.appendChild(messageDiv);
-  });
-
-  messagesContainer.scrollTop = messagesContainer.scrollHeight;
-}
-
-function escapeHtml(text) {
-  const div = document.createElement("div");
-  div.textContent = text;
-  return div.innerHTML;
-}
-
-function formatTime(dateString) {
-  if (!dateString) return "";
-  const date = new Date(dateString);
-  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-}
-document.addEventListener("DOMContentLoaded", function () {
-  loadParticipants().then(() => {
-    fetchMessages();
-  });
-});
-
-if (refreshBtn) {
-  refreshBtn.addEventListener("click", function () {
-    fetchMessages();
-  });
-}
-
-sendBtn.addEventListener("click", function () {
+function sendMessage() {
   const message = msgInput.value.trim();
-
   if (!message) {
     console.error("Message cannot be empty");
     return;
   }
 
-  msgInput.value = "";
+  const originalMessage = message;
+  const tempMessageId = "temp_" + Date.now();
+  const optimisticMessage = {
+    message_id: tempMessageId,
+    conversation_id: conversationId,
+    sender_user_id: userId,
+    content: message,
+    created_at: new Date().toISOString(),
+    delivered_at: null,
+    read_at: null,
+  };
 
+  const messageDiv = document.createElement("div");
+  messageDiv.className = "message sent";
+  messageDiv.id = tempMessageId;
+  messageDiv.innerHTML = `
+    <div class="message-content">
+      <p>${escapeHtml(message)}</p>
+      <div class="message-meta">
+        <span class="message-time">${formatTime(
+          optimisticMessage.created_at
+        )}</span>
+        <span class="message-status">✓</span>
+      </div>
+    </div>
+  `;
+  messagesContainer.appendChild(messageDiv);
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  msgInput.value = "";
   const messageData = {
     conversation_id: conversationId,
     sender_user_id: userId,
     content: message,
   };
-
   axios
     .post(BASE_URL + "message/create", messageData)
     .then((response) => {
       if (response.data.status === 200) {
         const messageId = response.data.data.id;
         console.log("Message sent successfully:", messageId);
+        const statusData = {
+          message_id: messageId,
+          user_id: otherUserId,
+        };
 
-        // Create status for the other participant
-        if (otherParticipantId) {
-          const statusData = {
-            message_id: messageId,
-            user_id: otherParticipantId,
-          };
-
-          return axios.post(BASE_URL + "status/create", statusData);
-        } else {
-          console.warn("Other participant ID not found");
-          return loadParticipants().then(() => {
-            if (otherParticipantId) {
-              const statusData = {
-                message_id: messageId,
-                user_id: otherParticipantId,
-              };
-              return axios.post(BASE_URL + "status/create", statusData);
+        return axios
+          .post(BASE_URL + "status/create", statusData)
+          .then((statusResponse) => {
+            if (statusResponse && statusResponse.data.status === 200) {
+              console.log("Status created successfully for user", otherUserId);
             }
+            return fetchMessages();
           });
-        }
       } else {
         throw new Error("Failed to send message");
       }
     })
-    .then((statusResponse) => {
-      if (statusResponse && statusResponse.data.status === 200) {
-        console.log("Status created successfully");
-
-        fetchMessages();
-      } else {
-        fetchMessages();
-      }
-    })
     .catch((error) => {
       console.error("Error sending message:", error);
-      msgInput.value = message;
+      const tempMsg = document.getElementById(tempMessageId);
+      if (tempMsg) {
+        tempMsg.remove();
+      }
+      alert("Failed to send message. Please try again.");
+      msgInput.value = originalMessage;
     });
+}
+
+sendBtn.addEventListener("click", sendMessage);
+
+msgInput.addEventListener("keypress", function (e) {
+  if (e.key === "Enter") {
+    sendMessage();
+  }
+});
+if (refreshBtn) {
+  refreshBtn.addEventListener("click", function () {
+    fetchMessages();
+  });
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  fetchMessages();
 });
