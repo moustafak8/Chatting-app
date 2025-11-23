@@ -89,7 +89,7 @@ if (document.getElementById("login")) {
           localStorage.setItem(
             "id", response.data.data.user.id.toString()
           );
-          window.location.href = "../user/index.html";
+          window.location.href = "../index.html";
         } else {
           alert(
             "Login failed: " + (response.data.data.message || "Unknown error")
