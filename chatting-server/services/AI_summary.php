@@ -5,10 +5,12 @@ class Ai_response
     public static function generateAIResponse($text)
     {
         global $apiKey;
-        $system = "";
-
-        $userContent = "";
-
+        $system = "You are an assistant that generates short, clear catch-up summaries for chat conversations. 
+                    Your task is to summarize only the unread messages that the user missed.
+                    Keep the summary brief, easy to understand, and written in a friendly tone.
+                    Do NOT invent information. 
+                    Only use the messages provided in the input.";
+        $userContent = "Here are the unread messages the user missed:\n\n" . $text . "\n\nGenerate a short catch-up summary of what happened.";
         $payload = [
             "model" => "gpt-4o-mini",
             "messages" => [
