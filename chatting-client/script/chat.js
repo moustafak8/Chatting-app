@@ -209,7 +209,6 @@ msgInput.addEventListener("keypress", function (e) {
 });
 if (refreshBtn) {
   refreshBtn.addEventListener("click", function () {
-    fetchMessages();
     markMessagesAsRead();
   });
 }
@@ -237,10 +236,5 @@ function markMessagesAsRead() {
 
 document.addEventListener("DOMContentLoaded", function () {
   fetchMessages();
-  markMessagesAsRead();
-});
-
-// Mark as read when window gains focus
-window.addEventListener("focus", function () {
   markMessagesAsRead();
 });
