@@ -7,8 +7,6 @@ User Authentication (Login / Register)
 
 1:1 Conversations with automatic conversation creation
 
-Real-Time Messaging Flow
-
 Messages saved to messages table
 
 Delivery & read receipts stored in message_status
